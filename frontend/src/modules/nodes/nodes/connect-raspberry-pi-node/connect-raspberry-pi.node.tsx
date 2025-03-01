@@ -113,7 +113,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
 
     const connect = useCallback(() => {
         // Validate form fields
-        const errors = [];
+        const errors: string[] = [];
         if (!data.hostname.trim()) errors.push("Hostname is required");
         if (!data.username.trim()) errors.push("Username is required");
         if (!data.port || data.port <= 0 || data.port > 65535) errors.push("Valid port number (1-65535) is required");
