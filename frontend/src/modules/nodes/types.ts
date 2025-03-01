@@ -7,9 +7,9 @@ export enum BuilderNode {
     CONDITIONAL_PATH = "conditional-path",
     CONNECT_RASPBERRY_PI = "connect-raspberry-pi",
     RUN_COMMAND = "run-command",
-    GPIO = "gpio", // Add this line
+    GPIO = "gpio",
+    LOOP = "loop",
 }
-
 export type BuilderNodeType = `${BuilderNode}`;
 
 export interface RegisterNodeMetadata<T = Record<string, any>> {

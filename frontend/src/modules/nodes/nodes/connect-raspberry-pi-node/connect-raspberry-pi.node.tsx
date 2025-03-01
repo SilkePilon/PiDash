@@ -26,22 +26,42 @@ type ConnectRaspberryPiNodeProps = NodeProps<Node<ConnectRaspberryPiNodeData, ty
 export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: ConnectRaspberryPiNodeProps) {
     const meta = useMemo(() => getNodeDetail(NODE_TYPE), []);
 
+    // Add state for collapsible panel
+    const [isDetailsExpanded, setIsDetailsExpanded] = useState(true);
     const [sourceHandleId] = useState<string>(nanoid());
     const [targetHandleId] = useState<string>(nanoid());
     const [showSuccess, setShowSuccess] = useState(false);
+    const [isFadingOut, setIsFadingOut] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
 
     const { setNodes } = useReactFlow();
     const deleteNode = useDeleteNode();
 
-    // Clear success notification after delay
+    // Clear success notification after delay with fade-out
     useEffect(() => {
         if (showSuccess) {
-            const timer = setTimeout(() => {
-                setShowSuccess(false);
+            const fadeOutTimer = setTimeout(() => {
+                setIsFadingOut(true);
             }, 2000);
-            return () => clearTimeout(timer);
+
+            const removeTimer = setTimeout(() => {
+                setShowSuccess(false);
+                setIsFadingOut(false);
+            }, 2500); // Wait for fade-out animation to complete
+
+            return () => {
+                clearTimeout(fadeOutTimer);
+                clearTimeout(removeTimer);
+            };
         }
     }, [showSuccess]);
+
+    // Auto-collapse details when connected
+    useEffect(() => {
+        if (data.connectionStatus === "connected") {
+            setIsDetailsExpanded(false);
+        }
+    }, [data.connectionStatus]);
 
     const updateConnectionDetails = useCallback(
         (field: keyof Omit<ConnectRaspberryPiNodeData, "connectionStatus" | "errorMessage">, value: string | number) => {
@@ -140,69 +160,83 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
 
             <div className="flex flex-col divide-y divide-dark-200">
                 <div className="relative min-h-10 flex flex-col">
-                    <div className="flex flex-col p-4">
-                        <div className="text-xs text-light-900/50 font-medium">Connection Details</div>
-
-                        <div className="mt-2 flex flex-col gap-3">
-                            <div>
-                                <label htmlFor={`hostname-${id}`} className="text-xs text-light-900/70 mb-1 block">
-                                    Hostname / IP
-                                </label>
-                                <input
-                                    id={`hostname-${id}`}
-                                    type="text"
-                                    value={data.hostname}
-                                    onChange={(e) => updateConnectionDetails("hostname", e.target.value)}
-                                    className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
-                                              focus:outline-none focus:border-red-500 transition-colors duration-200"
-                                    placeholder="raspberrypi.local"
-                                />
+                    {/* Collapsible Connection Details Panel */}
+                    <div className="flex flex-col">
+                        <div
+                            className="flex items-center justify-between px-4 py-2 cursor-pointer hover:bg-dark-300/30 transition-colors duration-200"
+                            onClick={() => setIsDetailsExpanded(!isDetailsExpanded)}
+                        >
+                            <div className="text-xs text-light-900/50 font-medium flex items-center">
+                                <div className="i-mdi:ethernet-cable mr-1.5 size-4" />
+                                Connection Details
                             </div>
+                            <div className={`i-mdi:chevron-down size-4 transition-transform duration-300 ${isDetailsExpanded ? "" : "-rotate-90"}`} />
+                        </div>
 
-                            <div className="flex gap-2">
-                                <div className="flex-1">
-                                    <label htmlFor={`port-${id}`} className="text-xs text-light-900/70 mb-1 block">
-                                        Port
-                                    </label>
-                                    <input
-                                        id={`port-${id}`}
-                                        type="number"
-                                        value={data.port}
-                                        onChange={(e) => updateConnectionDetails("port", parseInt(e.target.value))}
-                                        className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
-                                                  focus:outline-none focus:border-red-500 transition-colors duration-200"
-                                        placeholder="22"
-                                    />
+                        <div className={`overflow-hidden transition-all duration-300 ${isDetailsExpanded ? "max-h-96" : "max-h-0"}`}>
+                            <div className="p-4 pt-0">
+                                <div className="mt-2 flex flex-col gap-3">
+                                    <div>
+                                        <label htmlFor={`hostname-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                            Hostname / IP
+                                        </label>
+                                        <input
+                                            id={`hostname-${id}`}
+                                            type="text"
+                                            value={data.hostname}
+                                            onChange={(e) => updateConnectionDetails("hostname", e.target.value)}
+                                            className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
+                                                      focus:outline-none focus:border-red-500 transition-colors duration-200"
+                                            placeholder="raspberrypi.local"
+                                        />
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <label htmlFor={`port-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                                Port
+                                            </label>
+                                            <input
+                                                id={`port-${id}`}
+                                                type="number"
+                                                value={data.port}
+                                                onChange={(e) => updateConnectionDetails("port", parseInt(e.target.value))}
+                                                className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
+                                                          focus:outline-none focus:border-red-500 transition-colors duration-200"
+                                                placeholder="22"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor={`username-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                            Username
+                                        </label>
+                                        <input
+                                            id={`username-${id}`}
+                                            type="text"
+                                            value={data.username}
+                                            onChange={(e) => updateConnectionDetails("username", e.target.value)}
+                                            className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
+                                                      focus:outline-none focus:border-red-500 transition-colors duration-200"
+                                            placeholder="pi"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label htmlFor={`password-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                            Password
+                                        </label>
+                                        <input
+                                            id={`password-${id}`}
+                                            type="password"
+                                            value={data.password}
+                                            onChange={(e) => updateConnectionDetails("password", e.target.value)}
+                                            className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
+                                                      focus:outline-none focus:border-red-500 transition-colors duration-200"
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div>
-                                <label htmlFor={`username-${id}`} className="text-xs text-light-900/70 mb-1 block">
-                                    Username
-                                </label>
-                                <input
-                                    id={`username-${id}`}
-                                    type="text"
-                                    value={data.username}
-                                    onChange={(e) => updateConnectionDetails("username", e.target.value)}
-                                    className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
-                                              focus:outline-none focus:border-red-500 transition-colors duration-200"
-                                    placeholder="pi"
-                                />
-                            </div>
-
-                            <div>
-                                <label htmlFor={`password-${id}`} className="text-xs text-light-900/70 mb-1 block">
-                                    Password
-                                </label>
-                                <input
-                                    id={`password-${id}`}
-                                    type="password"
-                                    value={data.password}
-                                    onChange={(e) => updateConnectionDetails("password", e.target.value)}
-                                    className="w-full h-8 px-2 border border-dark-100 rounded-md bg-dark-400 text-sm
-                                              focus:outline-none focus:border-red-500 transition-colors duration-200"
-                                />
                             </div>
                         </div>
                     </div>
@@ -215,13 +249,28 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                         className="top-6! transition-all duration-300 hover:(important:ring-2 important:ring-red-500/50 important:scale-110)"
                     />
 
-                    <CustomHandle
-                        type="source"
-                        id={sourceHandleId}
-                        position={Position.Right}
-                        isConnectable={isConnectable && data.connectionStatus === "connected"}
-                        className="top-6! transition-all duration-300 hover:(important:ring-2 important:ring-red-500/50 important:scale-110)"
-                    />
+                    <div className="relative">
+                        <CustomHandle
+                            type="source"
+                            id={sourceHandleId}
+                            position={Position.Right}
+                            isConnectable={isConnectable && data.connectionStatus === "connected"}
+                            className={cn(
+                                "top-6! transition-all duration-300",
+                                data.connectionStatus === "connected"
+                                    ? "hover:(important:ring-2 important:ring-green-500/50 important:scale-110) bg-green-500/80!"
+                                    : "cursor-not-allowed hover:(important:ring-2 important:ring-gray-500/50) bg-gray-600/80!",
+                            )}
+                            onMouseEnter={() => data.connectionStatus !== "connected" && setShowTooltip(true)}
+                            onMouseLeave={() => setShowTooltip(false)}
+                        />
+
+                        {showTooltip && data.connectionStatus !== "connected" && (
+                            <div className="absolute top-6 right-[-8px] transform translate-x-full translate-y-[-50%] px-2 py-1 bg-dark-400 border border-dark-100 rounded text-xs text-light-900 z-50 whitespace-nowrap shadow-md">
+                                Connect to Raspberry Pi first
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex flex-col p-4">
@@ -269,8 +318,35 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                         )}
                     </div>
 
+                    {/* Connected Device Information */}
+                    {data.connectionStatus === "connected" && (
+                        <div className="mt-3 py-2 px-3 bg-dark-400/40 border border-dark-200 rounded-md">
+                            <div className="text-xs text-light-900/70 font-medium mb-1">
+                                <div className="i-mdi:server-network inline-block mr-1 size-3.5" /> Connected Device
+                            </div>
+                            <div className="flex flex-col gap-1 text-[0.7rem] text-light-900/60">
+                                <div className="flex items-center">
+                                    <div className="i-mdi:web inline-block mr-1.5 size-3" />
+                                    <span className="font-medium">{data.hostname}</span>:{data.port}
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="i-mdi:account inline-block mr-1.5 size-3" />
+                                    <span className="font-medium">{data.username}</span>
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="i-mdi:check-circle inline-block mr-1.5 size-3 text-green-400" />
+                                    <span>Ready to use</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {showSuccess && (
-                        <div className="mt-2 py-1.5 px-3 bg-green-500/10 border border-green-500/20 rounded-md text-xs text-green-400 animate-fadeIn flex items-center">
+                        <div
+                            className={`mt-2 py-1.5 px-3 bg-green-500/10 border border-green-500/20 rounded-md text-xs text-green-400
+                       ${isFadingOut ? "animate-fadeOut" : "animate-fadeIn"} flex items-center
+                       transition-opacity duration-300`}
+                        >
                             <div className="i-mdi:check-circle mr-1.5 size-4" />
                             Connection established successfully!
                         </div>

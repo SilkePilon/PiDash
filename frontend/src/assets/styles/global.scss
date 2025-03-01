@@ -25,3 +25,15 @@ body {
 .animate-fadeIn {
     animation: fadeIn 0.3s ease-in-out forwards;
 }
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.animate-fadeOut {
+    animation: fadeOut 0.5s ease-out forwards;
+}
