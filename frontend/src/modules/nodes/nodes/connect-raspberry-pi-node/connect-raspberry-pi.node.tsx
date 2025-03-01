@@ -19,6 +19,9 @@ export interface ConnectRaspberryPiNodeData extends BaseNodeData {
     password: string;
     connectionStatus: "disconnected" | "connecting" | "connected" | "error";
     errorMessage?: string;
+    // New fields for device info
+    piModel?: string;
+    piRam?: string;
 }
 
 type ConnectRaspberryPiNodeProps = NodeProps<Node<ConnectRaspberryPiNodeData, typeof NODE_TYPE>>;
@@ -56,10 +59,12 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
         }
     }, [showSuccess]);
 
-    // Auto-collapse details when connected
+    // Auto-collapse details when connected, expand when disconnected
     useEffect(() => {
         if (data.connectionStatus === "connected") {
             setIsDetailsExpanded(false);
+        } else if (data.connectionStatus === "disconnected") {
+            setIsDetailsExpanded(true);
         }
     }, [data.connectionStatus]);
 
@@ -78,6 +83,26 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
     );
 
     const connect = useCallback(() => {
+        // Validate form fields
+        const errors = [];
+        if (!data.hostname.trim()) errors.push("Hostname is required");
+        if (!data.username.trim()) errors.push("Username is required");
+        if (!data.port || data.port <= 0 || data.port > 65535) errors.push("Valid port number (1-65535) is required");
+
+        if (errors.length > 0) {
+            setNodes((nodes) =>
+                produce(nodes, (draft) => {
+                    const node = draft.find((n) => n.id === id);
+                    if (node) {
+                        const nodeData = node.data as ConnectRaspberryPiNodeData;
+                        nodeData.connectionStatus = "error";
+                        nodeData.errorMessage = errors.join(", ");
+                    }
+                }),
+            );
+            return;
+        }
+
         setNodes((nodes) =>
             produce(nodes, (draft) => {
                 const node = draft.find((n) => n.id === id);
@@ -95,6 +120,12 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                                     const nodeData = node.data as ConnectRaspberryPiNodeData;
                                     if (nodeData.hostname && nodeData.username) {
                                         nodeData.connectionStatus = "connected";
+
+                                        // Simulate getting device information
+                                        // In a real implementation, these would come from the actual Pi
+                                        nodeData.piModel = `Raspberry Pi ${Math.floor(Math.random() * 3) + 3}`; // Random Pi model 3-5
+                                        nodeData.piRam = `${Math.pow(2, Math.floor(Math.random() * 3) + 1)} GB`; // 2, 4, or 8 GB
+
                                         setShowSuccess(true);
                                     } else {
                                         nodeData.connectionStatus = "error";
@@ -107,7 +138,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                 }
             }),
         );
-    }, [id, setNodes]);
+    }, [id, setNodes, data.hostname, data.username, data.port]);
 
     const disconnect = useCallback(() => {
         setNodes((nodes) =>
@@ -117,6 +148,8 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                     const nodeData = node.data as ConnectRaspberryPiNodeData;
                     nodeData.connectionStatus = "disconnected";
                     nodeData.errorMessage = undefined;
+                    nodeData.piModel = undefined;
+                    nodeData.piRam = undefined;
                 }
             }),
         );
@@ -320,22 +353,40 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
 
                     {/* Connected Device Information */}
                     {data.connectionStatus === "connected" && (
-                        <div className="mt-3 py-2 px-3 bg-dark-400/40 border border-dark-200 rounded-md">
-                            <div className="text-xs text-light-900/70 font-medium mb-1">
-                                <div className="i-mdi:server-network inline-block mr-1 size-3.5" /> Connected Device
+                        <div
+                            className="mt-3 py-2 px-3 bg-dark-400/40 border border-dark-200 rounded-md
+                                       animate-slideInFromBottom hover:shadow-[0_0_12px_rgba(255,255,255,0.15)]
+                                       transition-all duration-300 hover:bg-dark-400/60 hover:border-dark-100
+                                       hover:translate-y-[-1px] relative overflow-hidden group"
+                        >
+                            {/* Add a subtle shimmer effect overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500 ease-in-out"></div>
+
+                            <div className="text-xs text-light-900/70 font-medium mb-1 flex items-center">
+                                <div className="i-mdi:server-network inline-block mr-1 size-3.5 animate-pulse text-green-400" />
+                                <span className="animate-fadeIn">Connected Device</span>
                             </div>
                             <div className="flex flex-col gap-1 text-[0.7rem] text-light-900/60">
-                                <div className="flex items-center">
+                                <div className="flex items-center animate-fadeIn animation-delay-100 hover:translate-x-1 transition-transform duration-200">
                                     <div className="i-mdi:web inline-block mr-1.5 size-3" />
                                     <span className="font-medium">{data.hostname}</span>:{data.port}
                                 </div>
-                                <div className="flex items-center">
+                                <div className="flex items-center animate-fadeIn animation-delay-200 hover:translate-x-1 transition-transform duration-200">
                                     <div className="i-mdi:account inline-block mr-1.5 size-3" />
                                     <span className="font-medium">{data.username}</span>
                                 </div>
-                                <div className="flex items-center">
+                                <div className="flex items-center animate-fadeIn animation-delay-300 hover:translate-x-1 transition-transform duration-200">
+                                    <div className="i-mdi:raspberry-pi inline-block mr-1.5 size-3 text-red-400 group-hover:rotate-12 transition-transform duration-300" />
+                                    <span className="font-medium">{data.piModel || "Raspberry Pi"}</span>
+                                    {data.piRam && (
+                                        <span className="ml-1.5 px-1.5 py-0.5 text-[0.65rem] bg-dark-300/50 rounded border border-transparent hover:border-green-500/30 transition-colors duration-300 animate-fadeIn animation-delay-350 hover:bg-dark-300/80">
+                                            {data.piRam} RAM
+                                        </span>
+                                    )}
+                                </div>
+                                <div className="flex items-center animate-fadeIn animation-delay-400 hover:translate-x-1 transition-transform duration-200 relative">
                                     <div className="i-mdi:check-circle inline-block mr-1.5 size-3 text-green-400" />
-                                    <span>Ready to use</span>
+                                    <span className="relative after:content-['_'] after:animate-pulse">Ready to use</span>
                                 </div>
                             </div>
                         </div>
@@ -378,5 +429,7 @@ export const metadata: RegisterNodeMetadata<ConnectRaspberryPiNodeData> = {
         username: "pi",
         password: "",
         connectionStatus: "disconnected",
+        piModel: undefined,
+        piRam: undefined,
     },
 };
