@@ -101,10 +101,10 @@ export function RunCommandNode({ id, isConnectable, selected, data }: RunCommand
     return (
         <div
             data-selected={selected}
-            className="w-xs border border-dark-200 rounded-xl bg-dark-300/50 shadow-sm backdrop-blur-xl transition-all duration-300 divide-y divide-dark-200
+            className="w-xs border border-dark-200 rounded-xl bg-dark-300/90 shadow-sm transition-all duration-300 divide-y divide-dark-200
                      data-[selected=true]:(border-red-500 ring-1 ring-red-500/50 shadow-[0_0_12px_rgba(239,68,68,0.15)])"
         >
-            <div className="relative overflow-clip rounded-t-xl bg-dark-300/50">
+            <div className="relative overflow-clip rounded-t-xl bg-dark-300">
                 <div className="absolute inset-0">
                     <div className="absolute h-full w-3/5 from-red-600/20 to-transparent bg-gradient-to-r" />
                 </div>
