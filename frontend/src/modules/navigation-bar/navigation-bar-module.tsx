@@ -32,7 +32,7 @@ export function NavigationBarModule() {
                     <div className="ml-3 h-full flex flex-col select-none justify-center gap-y-1 leading-none">
                         <div className="text-sm font-medium leading-none <md:(text-xs)">Pi Manager | Take Control Of Your Raspberry pi's</div>
 
-                        <div className="text-xs text-light-50/60 leading-none">By Azim Ahmed</div>
+                        <div className="text-xs text-light-50/60 leading-none">By Silke Pilon</div>
                     </div>
                 </div>
 
