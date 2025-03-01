@@ -37,6 +37,10 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
     const [isFadingOut, setIsFadingOut] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
 
+    // Add state for connection timer
+    const [connectionStartTime, setConnectionStartTime] = useState<Date | null>(null);
+    const [uptimeDisplay, setUptimeDisplay] = useState<string>("0:00:00");
+
     const { setNodes } = useReactFlow();
     const deleteNode = useDeleteNode();
 
@@ -67,6 +71,31 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
             setIsDetailsExpanded(true);
         }
     }, [data.connectionStatus]);
+
+    // Set connection start time when connected
+    useEffect(() => {
+        if (data.connectionStatus === "connected") {
+            setConnectionStartTime(new Date());
+        } else {
+            setConnectionStartTime(null);
+        }
+    }, [data.connectionStatus]);
+
+    // Update timer display every second
+    useEffect(() => {
+        if (data.connectionStatus === "connected" && connectionStartTime) {
+            const timerInterval = setInterval(() => {
+                const uptime = Date.now() - connectionStartTime.getTime();
+                const seconds = Math.floor((uptime / 1000) % 60);
+                const minutes = Math.floor((uptime / (1000 * 60)) % 60);
+                const hours = Math.floor(uptime / (1000 * 60 * 60));
+
+                setUptimeDisplay(`${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`);
+            }, 1000);
+
+            return () => clearInterval(timerInterval);
+        }
+    }, [connectionStartTime, data.connectionStatus]);
 
     const updateConnectionDetails = useCallback(
         (field: keyof Omit<ConnectRaspberryPiNodeData, "connectionStatus" | "errorMessage">, value: string | number) => {
@@ -366,6 +395,8 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                                 <div className="i-mdi:server-network inline-block mr-1 size-3.5 animate-pulse text-green-400" />
                                 <span className="animate-fadeIn">Connected Device</span>
                             </div>
+                            {/* Add separator line that extends fully across */}
+                            <div className="h-px bg-dark-200 w-[calc(100%+24px)] mb-2 mt-1.5 animate-fadeIn opacity-50 -mx-3"></div>
                             <div className="flex flex-col gap-1 text-[0.7rem] text-light-900/60">
                                 <div className="flex items-center animate-fadeIn animation-delay-100 hover:translate-x-1 transition-transform duration-200">
                                     <div className="i-mdi:web inline-block mr-1.5 size-3" />
@@ -387,6 +418,12 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                                 <div className="flex items-center animate-fadeIn animation-delay-400 hover:translate-x-1 transition-transform duration-200 relative">
                                     <div className="i-mdi:check-circle inline-block mr-1.5 size-3 text-green-400" />
                                     <span className="relative after:content-['_'] after:animate-pulse">Ready to use</span>
+                                </div>
+                                {/* Add uptime timer */}
+                                <div className="flex items-center animate-fadeIn animation-delay-450 hover:translate-x-1 transition-transform duration-200">
+                                    <div className="i-mdi:timer-outline inline-block mr-1.5 size-3 text-blue-400 animate-pulse" />
+                                    <span className="font-medium">Uptime:</span>
+                                    <span className="ml-1">{uptimeDisplay}</span>
                                 </div>
                             </div>
                         </div>
