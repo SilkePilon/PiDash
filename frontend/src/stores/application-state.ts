@@ -9,7 +9,7 @@ interface State {
         mobile: boolean;
     };
     sidebar: {
-        active: "node-properties" | "available-nodes" | "none";
+        active: "node-properties" | "available-nodes" | "available-raspberry-pis" | "none";
         panels: {
             nodeProperties: {
                 selectedNode: { id: string; type: BuilderNodeType } | null | undefined;
@@ -25,7 +25,7 @@ interface Actions {
             setMobileView: (isMobile: boolean) => void;
         };
         sidebar: {
-            setActivePanel: (panel: "node-properties" | "available-nodes" | "none") => void;
+            setActivePanel: (panel: "node-properties" | "available-nodes" | "available-raspberry-pis" | "none") => void;
             showNodePropertiesOf: (node: { id: string; type: BuilderNodeType }) => void;
             panels: {
                 nodeProperties: {
@@ -37,50 +37,58 @@ interface Actions {
     };
 }
 
-const applicationStateInstance = defineStoreInstance<State, Actions>((init) => {
-    return immer(set => ({
-        ...init,
-        actions: {
-            view: {
-                setMobileView: isMobile => set((state) => {
-                    state.view.mobile = isMobile;
-                }),
-            },
-            sidebar: {
-                setActivePanel: panel => set((state) => {
-                    state.sidebar.active = panel;
-                }),
-                showNodePropertiesOf: node => set((state) => {
-                    state.sidebar.active = "node-properties";
-                    state.sidebar.panels.nodeProperties.selectedNode = node;
-                }),
-                panels: {
-                    nodeProperties: {
-                        setSelectedNode: node => set((state) => {
+const applicationStateInstance = defineStoreInstance<State, Actions>(
+    (init) => {
+        return immer((set) => ({
+            ...init,
+            actions: {
+                view: {
+                    setMobileView: (isMobile) =>
+                        set((state) => {
+                            state.view.mobile = isMobile;
+                        }),
+                },
+                sidebar: {
+                    setActivePanel: (panel) =>
+                        set((state) => {
+                            state.sidebar.active = panel;
+                        }),
+                    showNodePropertiesOf: (node) =>
+                        set((state) => {
+                            state.sidebar.active = "node-properties";
                             state.sidebar.panels.nodeProperties.selectedNode = node;
                         }),
-                        setPaneSizes: sizes => set((state) => {
-                            state.sidebar.panels.nodeProperties.paneSizes = sizes;
-                        }),
+                    panels: {
+                        nodeProperties: {
+                            setSelectedNode: (node) =>
+                                set((state) => {
+                                    state.sidebar.panels.nodeProperties.selectedNode = node;
+                                }),
+                            setPaneSizes: (sizes) =>
+                                set((state) => {
+                                    state.sidebar.panels.nodeProperties.paneSizes = sizes;
+                                }),
+                        },
                     },
                 },
             },
-        },
-    }));
-}, {
-    view: {
-        mobile: false,
+        }));
     },
-    sidebar: {
-        active: "none",
-        panels: {
-            nodeProperties: {
-                selectedNode: null,
-                paneSizes: ["40%", "auto"],
+    {
+        view: {
+            mobile: false,
+        },
+        sidebar: {
+            active: "none",
+            panels: {
+                nodeProperties: {
+                    selectedNode: null,
+                    paneSizes: ["40%", "auto"],
+                },
             },
         },
     },
-});
+);
 
 export const [ApplicationStateProvider, useApplicationState] = createStoreContext<State, Actions>(applicationStateInstance);
 

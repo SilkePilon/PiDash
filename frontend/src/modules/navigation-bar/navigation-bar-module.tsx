@@ -10,13 +10,11 @@ import { Whenever } from "~@/components/generics/whenever";
 import { cn } from "~@/utils/cn";
 
 export function NavigationBarModule() {
-    const [isMobileView] = useApplicationState(s => [s.view.mobile]);
+    const [isMobileView] = useApplicationState((s) => [s.view.mobile]);
 
     const [isValidating, validateFlow] = useFlowValidator((isValid) => {
-        if (isValid)
-            toast.success("Flow is valid", { description: "You can now proceed to the next step", dismissible: true });
-        else
-            toast.error("Flow is invalid", { description: "Please check if the flow is complete and has no lone nodes" });
+        if (isValid) toast.success("Flow is valid", { description: "You can now proceed to the next step", dismissible: true });
+        else toast.error("Flow is invalid", { description: "Please check if the flow is complete and has no lone nodes" });
     });
 
     return (
@@ -28,19 +26,13 @@ export function NavigationBarModule() {
             <div className="relative flex items-stretch justify-between gap-x-8">
                 <div className="flex items-center py-0.5 pl-2">
                     <div className="size-8 flex shrink-0 select-none items-center justify-center rounded-lg bg-teal-600 text-sm font-bold leading-none">
-                        <span className="translate-y-px">
-                            DS
-                        </span>
+                        <span className="translate-y-px">DS</span>
                     </div>
 
                     <div className="ml-3 h-full flex flex-col select-none justify-center gap-y-1 leading-none">
-                        <div className="text-sm font-medium leading-none <md:(text-xs)">
-                            Chatbot Flow Builder - BiteSpeed Frontend Task
-                        </div>
+                        <div className="text-sm font-medium leading-none <md:(text-xs)">Pi Manager | Take Control Of Your Raspberry pi's</div>
 
-                        <div className="text-xs text-light-50/60 leading-none">
-                            By Azim Ahmed
-                        </div>
+                        <div className="text-xs text-light-50/60 leading-none">By Azim Ahmed</div>
                     </div>
                 </div>
 
@@ -62,25 +54,17 @@ export function NavigationBarModule() {
                                     <div className="i-mynaui:check-circle size-5" />
                                 </Switch.Case>
                             </Switch>
-                            <span className="pr-0.5">
-                                {isValidating ? "Validating Flow" : "Validate Flow"}
-                            </span>
+                            <span className="pr-0.5">{isValidating ? "Validating Flow" : "Validate Flow"}</span>
                         </button>
 
                         <div className="h-4 w-px bg-dark-300" />
 
                         <div className="flex items-stretch gap-x-0.5">
-                            <SocialButtonLink
-                                onClick={() => trackSocialLinkClick("linkedin")}
-                                href="https://www.linkedin.com/in/azimuahmed"
-                            >
+                            <SocialButtonLink onClick={() => trackSocialLinkClick("linkedin")} href="https://www.linkedin.com/in/azimuahmed">
                                 <div className="i-mynaui:brand-linkedin size-4.5" />
                             </SocialButtonLink>
 
-                            <SocialButtonLink
-                                onClick={() => trackSocialLinkClick("github")}
-                                href="https://github.com/Azim-Ahmed/chatbot-flow-builder"
-                            >
+                            <SocialButtonLink onClick={() => trackSocialLinkClick("github")} href="https://github.com/Azim-Ahmed/chatbot-flow-builder">
                                 <div className="i-mynaui:brand-github size-4.5" />
                             </SocialButtonLink>
                         </div>

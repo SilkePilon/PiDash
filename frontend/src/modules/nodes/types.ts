@@ -5,6 +5,9 @@ export enum BuilderNode {
     END = "end",
     TEXT_MESSAGE = "text-message",
     CONDITIONAL_PATH = "conditional-path",
+    CONNECT_RASPBERRY_PI = "connect-raspberry-pi",
+    RUN_COMMAND = "run-command",
+    GPIO = "gpio", // Add this line
 }
 
 export type BuilderNodeType = `${BuilderNode}`;

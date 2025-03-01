@@ -31,6 +31,9 @@ export function DesktopSidebarFragment({ isMobileView, activePanel, setActivePan
                     <SidebarButtonItem active={activePanel === "available-nodes"} onClick={() => setActivePanel("available-nodes")}>
                         <div className="i-mynaui:grid size-5" />
                     </SidebarButtonItem>
+                    <SidebarButtonItem active={activePanel === "available-raspberry-pis"} onClick={() => setActivePanel("available-raspberry-pis")}>
+                        <div className="i-mynaui:chip size-5" />
+                    </SidebarButtonItem>
 
                     <div className="mx-a h-px w-4 bg-dark-100" />
 
