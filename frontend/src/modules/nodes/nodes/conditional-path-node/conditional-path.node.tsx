@@ -9,7 +9,6 @@ import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
 import { ConditionDropdownSelector } from "~/modules/nodes/nodes/conditional-path-node/components/condition-dropdown-selector";
 import { NodePath } from "~/modules/nodes/nodes/conditional-path-node/components/node-path";
 import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
-import { getNodeDetail } from "~/modules/nodes/utils";
 
 import { cn } from "~@/utils/cn";
 
