@@ -502,7 +502,7 @@ export const metadata: RegisterNodeMetadata<GPIONodeData> = {
     type: NODE_TYPE,
     node: memo(GPIONode),
     detail: {
-        icon: "i-mdi:gpio",
+        icon: "i-mdi:led-variant-on",
         title: "Raspberry Pi GPIO",
         description: "Control GPIO pins on the connected Raspberry Pi.",
     },
