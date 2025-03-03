@@ -57,7 +57,7 @@ export function TextMessageNode({ id, isConnectable, selected, data }: TextMessa
         <>
             <div
                 data-selected={selected}
-                className="w-xs overflow-clip border border-dark-200 rounded-xl bg-dark-300/50 shadow-sm backdrop-blur-xl transition divide-y divide-dark-200 data-[selected=true]:(border-teal-600 ring-1 ring-teal-600/50)"
+                className="w-xs overflow-clip border border-dark-200 rounded-xl bg-dark-300/50 shadow-sm transition divide-y divide-dark-200 data-[selected=true]:(border-teal-600 ring-1 ring-teal-600/50)"
                 onDoubleClick={showNodeProperties}
             >
                 <div className="relative bg-dark-300/50">

@@ -239,7 +239,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                             <div className="p-4 pt-0">
                                 <div className="mt-2 flex flex-col gap-3">
                                     <div>
-                                        <label htmlFor={`hostname-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                        <label htmlFor={`hostname-${id}`} className="text-xs text-light-900/50 font-medium mb-1 block">
                                             Hostname / IP
                                         </label>
                                         <input
@@ -255,7 +255,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
 
                                     <div className="flex gap-2">
                                         <div className="flex-1">
-                                            <label htmlFor={`port-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                            <label htmlFor={`port-${id}`} className="text-xs text-light-900/50 font-medium  mb-1 block">
                                                 Port
                                             </label>
                                             <input
@@ -271,7 +271,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                                     </div>
 
                                     <div>
-                                        <label htmlFor={`username-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                        <label htmlFor={`username-${id}`} className="text-xs text-light-900/50 font-medium mb-1 block">
                                             Username
                                         </label>
                                         <input
@@ -286,7 +286,7 @@ export function ConnectRaspberryPiNode({ id, isConnectable, selected, data }: Co
                                     </div>
 
                                     <div>
-                                        <label htmlFor={`password-${id}`} className="text-xs text-light-900/70 mb-1 block">
+                                        <label htmlFor={`password-${id}`} className="text-xs text-light-900/50 font-medium mb-1 block">
                                             Password
                                         </label>
                                         <input

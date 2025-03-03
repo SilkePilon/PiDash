@@ -28,7 +28,7 @@ export function MessageChannelSelector({ detail, onSelect }: MessageChannelSelec
                 <DropdownMenu.Content
                     sideOffset={5}
                     className={cn(
-                        "min-w-40 select-none border border-dark-100 rounded-lg bg-dark-200/90 p-0.5 text-light-50 shadow-xl backdrop-blur-lg transition",
+                        "min-w-40 select-none border border-dark-100 rounded-lg bg-dark-200 p-0.5 text-light-50 shadow-lg transition",
                         "animate-in data-[side=top]:slide-in-bottom-0.5 data-[side=bottom]:slide-in-bottom--0.5 data-[side=bottom]:fade-in-40 data-[side=top]:fade-in-40",
                     )}
                 >

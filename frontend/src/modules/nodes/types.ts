@@ -11,6 +11,7 @@ export enum BuilderNode {
     LOOP = "loop",
     RUN_JAVASCRIPT = "run-javascript",
     RUN_PYTHON = "run-python",
+    GITHUB = "github",
 }
 export type BuilderNodeType = `${BuilderNode}`;
 
