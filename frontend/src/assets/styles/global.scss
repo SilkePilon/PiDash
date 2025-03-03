@@ -12,23 +12,28 @@ body {
 #root {
     @apply w-full h-full of-hidden;
 }
+
 @keyframes fadeIn {
     from {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
+
 .animate-fadeIn {
     animation: fadeIn 0.3s ease-in-out forwards;
 }
+
 @keyframes fadeOut {
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
@@ -36,4 +41,78 @@ body {
 
 .animate-fadeOut {
     animation: fadeOut 0.5s ease-out forwards;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes scaleOut {
+    from {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+}
+
+/* Custom scrollbar styling for the AceEditor */
+.ace_scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.ace_scrollbar::-webkit-scrollbar-track {
+    background: rgba(30, 30, 30, 0.2);
+    border-radius: 4px;
+}
+
+.ace_scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(100, 100, 100, 0.5);
+    border-radius: 4px;
+}
+
+.ace_scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(120, 120, 120, 0.7);
+}
+
+/* Additional styling for the small editor in the node */
+[id^="js-editor-"] {
+    .ace_scrollbar-v::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .ace_scrollbar-v::-webkit-scrollbar-thumb {
+        background: rgba(80, 80, 80, 0.4);
+    }
+
+    .ace_scrollbar-v::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 100, 100, 0.6);
+    }
+}
+
+/* Additional styling for the small editor in the node */
+[id^="python-editor-"] {
+    .ace_scrollbar-v::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .ace_scrollbar-v::-webkit-scrollbar-thumb {
+        background: rgba(80, 80, 80, 0.4);
+    }
+
+    .ace_scrollbar-v::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 100, 100, 0.6);
+    }
 }

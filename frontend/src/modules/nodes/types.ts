@@ -9,6 +9,8 @@ export enum BuilderNode {
     RUN_COMMAND = "run-command",
     GPIO = "gpio",
     LOOP = "loop",
+    RUN_JAVASCRIPT = "run-javascript",
+    RUN_PYTHON = "run-python",
 }
 export type BuilderNodeType = `${BuilderNode}`;
 
