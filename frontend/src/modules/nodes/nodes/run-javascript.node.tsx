@@ -14,7 +14,7 @@ import "ace-builds/src-noconflict/keybinding-vscode";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 import { cn } from "~@/utils/cn";
 
@@ -565,9 +565,10 @@ export const metadata: RegisterNodeMetadata<RunJavaScriptNodeData> = {
         icon: "i-vscode-icons:file-type-js-official",
         title: "Run JavaScript",
         description: "Execute JavaScript code on the connected Raspberry Pi.",
+        category: NodeCategory.EXECUTION
     },
     defaultData: {
-        code: "// Write your JavaScript code here\nconsole.log('Hello from Raspberry Pi!');\n\n// Example:\n// const result = Math.random() * 100;\n// console.log(`Random value: ${result.toFixed(2)}`);\n",
+        code: "// Write your JavaScript code here\nconsole.log('Hello from Raspberry Pi!');\n",
         output: "",
         status: "idle",
     },

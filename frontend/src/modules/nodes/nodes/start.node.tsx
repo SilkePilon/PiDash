@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { memo, useMemo, useState } from "react";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 
 import { cn } from "~@/utils/cn";
@@ -51,11 +51,10 @@ export const metadata: RegisterNodeMetadata<StartNodeData> = {
     detail: {
         icon: "i-mynaui:play",
         title: "Start",
-        description: "Start the chatbot flow",
+        description: "Starting point of the flow.",
+        category: NodeCategory.BASIC
     },
-    available: false,
     defaultData: {
-        label: "Start",
-        deletable: false,
+        label: "",
     },
 };

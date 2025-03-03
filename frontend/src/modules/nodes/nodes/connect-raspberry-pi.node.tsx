@@ -5,7 +5,7 @@ import { memo, useCallback, useMemo, useState, useEffect } from "react";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 
 import { cn } from "~@/utils/cn";
@@ -459,6 +459,7 @@ export const metadata: RegisterNodeMetadata<ConnectRaspberryPiNodeData> = {
         icon: "i-mdi:raspberry-pi",
         title: "Connect Raspberry Pi",
         description: "Connect to a Raspberry Pi device.",
+        category: NodeCategory.RASPBERRY_PI
     },
     defaultData: {
         hostname: "",

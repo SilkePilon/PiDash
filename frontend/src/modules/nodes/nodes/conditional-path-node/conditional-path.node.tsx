@@ -6,7 +6,7 @@ import { memo, useCallback, useMemo, useState, useEffect } from "react";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 
 import { cn } from "~@/utils/cn";
 
@@ -564,6 +564,7 @@ export const metadata: RegisterNodeMetadata<ConditionalPathNodeData> = {
         icon: "i-mynaui:git-branch",
         title: "Condition Path",
         description: "Check Raspberry Pi metrics and take different paths based on conditions.",
+        category: NodeCategory.CONTROL_FLOW
     },
     defaultData: {
         categoryId: null,

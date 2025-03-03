@@ -14,7 +14,7 @@ import "ace-builds/src-noconflict/keybinding-vscode";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 import { cn } from "~@/utils/cn";
 
@@ -567,9 +567,10 @@ export const metadata: RegisterNodeMetadata<RunPythonNodeData> = {
         icon: "i-vscode-icons:file-type-python",
         title: "Run Python",
         description: "Execute Python code on the connected Raspberry Pi.",
+        category: NodeCategory.EXECUTION
     },
     defaultData: {
-        code: "# Write your Python code here\nprint('Hello from Raspberry Pi!')\n\n# Example with GPIO (requires RPi.GPIO library):\n# import RPi.GPIO as GPIO\n# GPIO.setmode(GPIO.BCM)\n# GPIO.setup(18, GPIO.OUT)\n# GPIO.output(18, GPIO.HIGH)\n# print('GPIO pin 18 turned ON')\n",
+        code: "# Write your Python code here\nprint('Hello from Raspberry Pi!')\n",
         output: "",
         status: "idle",
     },

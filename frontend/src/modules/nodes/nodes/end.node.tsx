@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { memo, useMemo, useState } from "react";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 
 import { cn } from "~@/utils/cn";
@@ -52,11 +52,10 @@ export const metadata: RegisterNodeMetadata<EndNodeData> = {
     detail: {
         icon: "i-mynaui:stop",
         title: "End",
-        description: "End the chatbot flow",
+        description: "Ending point of the flow.",
+        category: NodeCategory.BASIC
     },
-    available: false,
     defaultData: {
-        label: "End",
-        deletable: false,
+        label: "",
     },
 };

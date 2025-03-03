@@ -12,4 +12,5 @@ export const AVAILABLE_NODES = NODES.filter(node => node.available === undefined
     icon: node.detail.icon,
     title: node.detail.title,
     description: node.detail.description,
+    category: node.detail.category, // Add category to available nodes
 }));

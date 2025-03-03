@@ -8,7 +8,7 @@ import CustomHandle from "~/modules/flow-builder/components/handles/custom-handl
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
 import { GitHubOperationSelector } from "~/modules/nodes/nodes/github-node/components/github-operation-selector";
 import { type GitHubOperationDetail, type GitHubOperationType, getGitHubOperationDetails } from "~/modules/nodes/nodes/github-node/constants/operations";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 import GitHubNodePropertyPanel from "~/modules/sidebar/panels/node-properties/property-panels/github-property-panel";
 import { useApplicationState } from "~/stores/application-state";
@@ -287,6 +287,7 @@ export const metadata: RegisterNodeMetadata<GitHubNodeData> = {
         icon: "i-uil:github",
         title: "GitHub",
         description: "Interact with GitHub repositories, perform Git operations, and respond to GitHub events.",
+        category: NodeCategory.INTEGRATIONS
     },
     defaultData: {
         operation: "pull",

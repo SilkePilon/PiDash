@@ -15,6 +15,22 @@ export enum BuilderNode {
 }
 export type BuilderNodeType = `${BuilderNode}`;
 
+export enum NodeCategory {
+    BASIC = "basic",
+    CONTROL_FLOW = "control-flow",
+    RASPBERRY_PI = "raspberry-pi",
+    EXECUTION = "execution",
+    INTEGRATIONS = "integrations"
+}
+export type NodeCategoryType = `${NodeCategory}`;
+
+export interface NodeCategoryMetadata {
+    id: NodeCategory;
+    name: string;
+    icon: string;
+    description: string;
+}
+
 export interface RegisterNodeMetadata<T = Record<string, any>> {
     type: BuilderNodeType;
     node: ComponentType<any>;
@@ -22,6 +38,7 @@ export interface RegisterNodeMetadata<T = Record<string, any>> {
         icon: string;
         title: string;
         description: string;
+        category: NodeCategory; // Add category to node metadata
     };
     available?: boolean;
     defaultData?: T;

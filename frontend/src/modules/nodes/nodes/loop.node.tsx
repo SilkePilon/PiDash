@@ -5,7 +5,7 @@ import { memo, useCallback, useMemo, useState, useEffect, useRef } from "react";
 
 import CustomHandle from "~/modules/flow-builder/components/handles/custom-handle";
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 
 import { cn } from "~@/utils/cn";
@@ -477,6 +477,7 @@ export const metadata: RegisterNodeMetadata<LoopNodeData> = {
         icon: "i-mdi:loop",
         title: "Loop",
         description: "Loop execution of connected nodes with a configurable delay.",
+        category: NodeCategory.CONTROL_FLOW
     },
     defaultData: {
         iterations: 5,

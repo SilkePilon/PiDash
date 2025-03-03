@@ -8,7 +8,7 @@ import CustomHandle from "~/modules/flow-builder/components/handles/custom-handl
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
 import { MessageChannelSelector } from "~/modules/nodes/nodes/text-message-node/components/message-channel-selector";
 import { type MessageChannelDetail, type MessageChannelType, getMessageChannelDetails } from "~/modules/nodes/nodes/text-message-node/constants/channels";
-import { type BaseNodeData, BuilderNode, type RegisterNodeMetadata } from "~/modules/nodes/types";
+import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
 import TextMessageNodePropertyPanel from "~/modules/sidebar/panels/node-properties/property-panels/text-message-property-panel";
 import { useApplicationState } from "~/stores/application-state";
@@ -170,6 +170,7 @@ export const metadata: RegisterNodeMetadata<TextMessageNodeData> = {
         icon: "i-mynaui:chat",
         title: "Text Message",
         description: "Send a text message to the user using different messaging platforms like WhatsApp, Messenger, etc.",
+        category: NodeCategory.INTEGRATIONS
     },
     defaultData: {
         channel: "sms",
