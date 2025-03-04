@@ -104,7 +104,7 @@ export const SavedFlowsModal = memo(({ isOpen, onClose }: SavedFlowsModalProps) 
             <div className="flex shrink-0 items-center gap-x-2 pr-2">
               <button
                 onClick={loadFlows}
-                className="size-7 flex items-center justify-center text-light-900/50 hover:text-light-900/70"
+                className="size-8 flex items-center justify-center border border-transparent rounded-lg bg-transparent text-blue-400 outline-none transition-all duration-200 active:(border-dark-200 bg-dark-400/50) hover:(bg-dark-100 rotate-12)"
                 title="Refresh flows"
               >
                 <div className={cn(
