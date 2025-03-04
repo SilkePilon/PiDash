@@ -67,7 +67,9 @@ export default function AvailableNodesPanel() {
                     placeholder="Search nodes..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 rounded-lg bg-light-950 border border-light-800 text-light-50"
+                    className="w-full p-2 rounded-lg bg-dark-300 border border-dark-200 text-light-50
+                             placeholder:text-light-900/30 transition-all duration-200
+                             focus:outline-none focus:border-gray-800 focus:ring-1 focus:ring-gray-800/20"
                 />
             </div>
 

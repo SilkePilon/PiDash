@@ -22,13 +22,13 @@ export const NODE_CATEGORIES: NodeCategoryMetadata[] = [
     {
         id: NodeCategory.EXECUTION,
         name: "Code Execution",
-        icon: "i-mdi:code-braces",
+        icon: "i-mynaui:command",
         description: "Nodes for executing code and commands"
     },
     {
         id: NodeCategory.INTEGRATIONS,
         name: "Integrations",
-        icon: "i-mdi:connection", 
+        icon: "i-mynaui:connection",
         description: "Integration nodes for external services"
     }
 ];
