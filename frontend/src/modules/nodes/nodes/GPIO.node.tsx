@@ -509,7 +509,7 @@ export const metadata: RegisterNodeMetadata<GPIONodeData> = {
     },
     defaultData: {
         pins: {},
-        mode: 'output',
-        value: false,
+        pinNumberingScheme: "bcm",
+        status: "disconnected"
     },
 };
