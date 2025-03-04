@@ -7,6 +7,7 @@ import CustomHandle from "~/modules/flow-builder/components/handles/custom-handl
 import { useDeleteNode } from "~/modules/flow-builder/hooks/use-delete-node";
 import { type BaseNodeData, BuilderNode, NodeCategory, type RegisterNodeMetadata } from "~/modules/nodes/types";
 import { getNodeDetail } from "~/modules/nodes/utils";
+import { flowExecutionService } from "~/services/flowExecutionService";
 
 import { cn } from "~@/utils/cn";
 
@@ -29,6 +30,7 @@ export interface GPIONodeData extends BaseNodeData {
     pinNumberingScheme: "bcm" | "physical";
     status: "disconnected" | "connected" | "error";
     errorMessage?: string;
+    piId?: string; // Reference to connected Raspberry Pi ID
 }
 
 type GPIONodeProps = NodeProps<Node<GPIONodeData, typeof NODE_TYPE>>;
@@ -66,9 +68,31 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
     const [animatingPin, setAnimatingPin] = useState<number | null>(null);
     const [connectingAnimation, setConnectingAnimation] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [availablePis, setAvailablePis] = useState<{id: string, name: string}[]>([]);
+    const [selectedPiId, setSelectedPiId] = useState<string | undefined>(data.piId);
 
     const { setNodes } = useReactFlow();
     const deleteNode = useDeleteNode();
+
+    // Load available Raspberry Pis on component mount
+    useEffect(() => {
+        const loadRaspberryPis = async () => {
+            try {
+                const pis = await flowExecutionService.getRaspberryPis();
+                setAvailablePis(pis);
+                
+                // Set the first Pi as default if none is selected
+                if (!selectedPiId && pis.length > 0) {
+                    setSelectedPiId(pis[0].id);
+                    updateNodePiId(pis[0].id);
+                }
+            } catch (error) {
+                console.error('Failed to load Raspberry Pi devices:', error);
+            }
+        };
+        
+        loadRaspberryPis();
+    }, []);
 
     // Clear animation states after delays
     useEffect(() => {
@@ -95,6 +119,17 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
             [group]: !prev[group],
         }));
     }, []);
+
+    const updateNodePiId = useCallback((piId: string) => {
+        setNodes((nodes) =>
+            produce(nodes, (draft) => {
+                const node = draft.find((n) => n.id === id);
+                if (node) {
+                    (node.data as GPIONodeData).piId = piId;
+                }
+            }),
+        );
+    }, [id, setNodes]);
 
     const updatePinMode = useCallback(
         (pinNumber: number, mode: PinMode) => {
@@ -143,21 +178,83 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
     );
 
     const updatePinState = useCallback(
-        (pinNumber: number, state: PinState) => {
+        async (pinNumber: number, state: PinState) => {
+            if (!selectedPiId || data.status !== 'connected') {
+                // Show error message if not connected
+                setNodes((nodes) =>
+                    produce(nodes, (draft) => {
+                        const node = draft.find((n) => n.id === id);
+                        if (node) {
+                            const nodeData = node.data as GPIONodeData;
+                            nodeData.errorMessage = "Cannot control pin: Raspberry Pi not connected.";
+                        }
+                    }),
+                );
+                
+                // Clear error message after 3 seconds
+                setTimeout(() => {
+                    setNodes((nodes) =>
+                        produce(nodes, (draft) => {
+                            const node = draft.find((n) => n.id === id);
+                            if (node) {
+                                const nodeData = node.data as GPIONodeData;
+                                nodeData.errorMessage = undefined;
+                            }
+                        }),
+                    );
+                }, 3000);
+                
+                return;
+            }
+
             setAnimatingPin(pinNumber);
 
-            setNodes((nodes) =>
-                produce(nodes, (draft) => {
-                    const node = draft.find((n) => n.id === id);
-                    if (node) {
-                        const nodeData = node.data as GPIONodeData;
-                        if (nodeData.pins[pinNumber]) {
-                            nodeData.pins[pinNumber].state = state;
-                            nodeData.pins[pinNumber].animating = true;
+            try {
+                // Convert state to boolean for high/low values for the API
+                const apiState = state === 'high' ? true : 
+                              state === 'low' ? false : 
+                              state; // Keep as number for PWM
+                
+                // Send GPIO state to backend
+                await flowExecutionService.setGPIOState(selectedPiId, pinNumber, apiState);
+
+                setNodes((nodes) =>
+                    produce(nodes, (draft) => {
+                        const node = draft.find((n) => n.id === id);
+                        if (node) {
+                            const nodeData = node.data as GPIONodeData;
+                            if (nodeData.pins[pinNumber]) {
+                                nodeData.pins[pinNumber].state = state;
+                                nodeData.pins[pinNumber].animating = true;
+                            }
                         }
-                    }
-                }),
-            );
+                    }),
+                );
+            } catch (error) {
+                // Update error state
+                setNodes((nodes) =>
+                    produce(nodes, (draft) => {
+                        const node = draft.find((n) => n.id === id);
+                        if (node) {
+                            const nodeData = node.data as GPIONodeData;
+                            nodeData.errorMessage = error instanceof Error ? error.message : "Failed to update pin state";
+                        }
+                    }),
+                );
+                
+                // Clear error after 3 seconds
+                setTimeout(() => {
+                    setNodes((nodes) =>
+                        produce(nodes, (draft) => {
+                            const node = draft.find((n) => n.id === id);
+                            if (node) {
+                                const nodeData = node.data as GPIONodeData;
+                                nodeData.errorMessage = undefined;
+                            }
+                        }),
+                    );
+                }, 3000);
+            }
 
             // Clear animation flag after delay
             setTimeout(() => {
@@ -174,7 +271,7 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
                 );
             }, 500);
         },
-        [id, setNodes],
+        [id, setNodes, selectedPiId, data.status],
     );
 
     const updatePinNumberingScheme = useCallback(
@@ -191,26 +288,57 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
         [id, setNodes],
     );
 
-    const checkConnection = useCallback(() => {
-        // Show connecting animation
-        setConnectingAnimation(true);
-
-        setTimeout(() => {
+    const checkConnection = useCallback(async () => {
+        if (!selectedPiId) {
             setNodes((nodes) =>
                 produce(nodes, (draft) => {
                     const node = draft.find((n) => n.id === id);
                     if (node) {
                         const nodeData = node.data as GPIONodeData;
-                        nodeData.status = "connected";
-                        nodeData.errorMessage = undefined;
+                        nodeData.errorMessage = "No Raspberry Pi selected";
+                    }
+                }),
+            );
+            return;
+        }
+
+        // Show connecting animation
+        setConnectingAnimation(true);
+
+        try {
+            // Check connection with backend
+            const status = await flowExecutionService.checkDeviceStatus('raspberry-pi', selectedPiId);
+
+            setNodes((nodes) =>
+                produce(nodes, (draft) => {
+                    const node = draft.find((n) => n.id === id);
+                    if (node) {
+                        const nodeData = node.data as GPIONodeData;
+                        nodeData.status = status.online ? "connected" : "error";
+                        nodeData.errorMessage = status.online ? undefined : status.message || "Could not connect to device";
                     }
                 }),
             );
 
+            if (status.online) {
+                setShowSuccess(true);
+            }
+        } catch (error) {
+            // Update status to error
+            setNodes((nodes) =>
+                produce(nodes, (draft) => {
+                    const node = draft.find((n) => n.id === id);
+                    if (node) {
+                        const nodeData = node.data as GPIONodeData;
+                        nodeData.status = "error";
+                        nodeData.errorMessage = error instanceof Error ? error.message : "Failed to check connection";
+                    }
+                }),
+            );
+        } finally {
             setConnectingAnimation(false);
-            setShowSuccess(true);
-        }, 1500);
-    }, [id, setNodes]);
+        }
+    }, [id, selectedPiId, setNodes]);
 
     const renderPin = (pinInfo: Omit<PinData, "mode" | "state">) => {
         const pin = data.pins[pinInfo.pinNumber] || {
@@ -375,6 +503,26 @@ export function GPIONode({ id, isConnectable, selected, data }: GPIONodeProps) {
                                 Physical
                             </button>
                         </div>
+                    </div>
+
+                    {/* Raspberry Pi Selection */}
+                    <div className="mb-3">
+                        <label className="block text-xs font-medium text-light-900/70 mb-1">Raspberry Pi</label>
+                        <select
+                            value={selectedPiId || ''}
+                            onChange={(e) => {
+                                setSelectedPiId(e.target.value);
+                                updateNodePiId(e.target.value);
+                            }}
+                            className="w-full bg-dark-500 border border-dark-100 rounded py-2 px-3
+                                     transition-colors duration-200 hover:border-red-500/30 focus:border-red-500
+                                     focus:outline-none"
+                        >
+                            <option value="">Select a Raspberry Pi</option>
+                            {availablePis.map(pi => (
+                                <option key={pi.id} value={pi.id}>{pi.name}</option>
+                            ))}
+                        </select>
                     </div>
 
                     <div className="flex justify-between items-center mb-3">

@@ -1,6 +1,6 @@
 import { immer } from "zustand/middleware/immer";
 
-import type { BuilderNodeType } from "~/modules/nodes/types";
+import type { BuilderNodeType, BuilderNode } from "~/modules/nodes/types";
 
 import { createStoreContext, defineStoreInstance } from "~@/store";
 

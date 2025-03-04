@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect } from "react";
 import { useMedia } from "react-use";
 import { isProduction } from "std-env";
 
+import { AuthWrapper } from "~/modules/auth/auth-module"; 
 import { useApplicationState } from "~/stores/application-state";
 
 import { Whenever } from "~@/components/generics/whenever";
@@ -29,7 +30,7 @@ function RootLayout() {
     }, [isMobile]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
-        <>
+        <AuthWrapper>
             <Outlet />
 
             <Whenever condition={isProduction}>
@@ -37,6 +38,6 @@ function RootLayout() {
                     <TanStackRouterDevtools />
                 </Suspense>
             </Whenever>
-        </>
+        </AuthWrapper>
     );
 }

@@ -4,6 +4,7 @@ import { useCallback } from "react";
 
 import CustomControls from "~/modules/flow-builder/components/controls/custom-controls";
 import CustomDeletableEdge from "~/modules/flow-builder/components/edges/custom-deletable-edge";
+import { ExecutionControls } from "~/modules/flow-builder/components/controls/execution-controls";
 import { defaultEdges, defaultNodes } from "~/modules/flow-builder/constants/default-nodes-edges";
 import { useDeleteKeyCode } from "~/modules/flow-builder/hooks/use-delete-key-code";
 import { useDragDropFlowBuilder } from "~/modules/flow-builder/hooks/use-drag-drop-flow-builder";
@@ -102,6 +103,7 @@ export function FlowBuilderModule() {
         >
             <Background color={isMobileView ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.25)"} gap={32} />
             <CustomControls />
+            <ExecutionControls />
         </ReactFlow>
     );
 }

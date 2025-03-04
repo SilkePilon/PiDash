@@ -24,6 +24,16 @@ export enum NodeCategory {
 }
 export type NodeCategoryType = `${NodeCategory}`;
 
+export enum ExecutionStatus {
+    NONE = "none",
+    PENDING = "pending",
+    RUNNING = "running",
+    SUCCESS = "success",
+    ERROR = "error",
+    SKIPPED = "skipped"
+}
+export type ExecutionStatusType = `${ExecutionStatus}`;
+
 export interface NodeCategoryMetadata {
     id: NodeCategory;
     name: string;
@@ -47,4 +57,16 @@ export interface RegisterNodeMetadata<T = Record<string, any>> {
 
 export interface BaseNodeData extends Record<string, any> {
     deletable?: boolean;
+    
+    // Execution state properties
+    executing?: boolean;
+    executionStatus?: ExecutionStatusType;
+    executionResult?: {
+        success: boolean;
+        message?: string;
+        stdout?: string;
+        stderr?: string;
+        error?: string;
+        [key: string]: any;
+    };
 }

@@ -4,6 +4,7 @@ import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { useMemo } from "react";
 import SplitPane, { Pane } from "split-pane-react";
 
+import { ExecutionExplorerPanel } from "~/modules/flow-builder/components/execution-explorer/execution-explorer-panel";
 import { BuilderNode } from "~/modules/nodes/types";
 import SidebarPanelHeading from "~/modules/sidebar/components/sidebar-panel-heading";
 import SidebarPanelWrapper from "~/modules/sidebar/components/sidebar-panel-wrapper";
@@ -43,6 +44,13 @@ export function NodePropertiesPanel() {
         return nodes.find(n => n.id === selectedNode?.id)?.data;
     }, [nodes, selectedNode?.id]);
 
+    // Check if selected node has execution data to show the execution panel
+    const hasExecutionData = useMemo(() => {
+        if (!selectedNode) return false;
+        const node = nodes.find(n => n.id === selectedNode.id);
+        return node && (node.data.executing || node.data.executionStatus || node.data.executionResult);
+    }, [nodes, selectedNode]);
+
     return (
         <SidebarPanelWrapper>
             <SplitPane
@@ -51,7 +59,7 @@ export function NodePropertiesPanel() {
                 onChange={setPaneSizes}
                 split="horizontal"
             >
-                <Pane minSize={200}>
+                <Pane minSize={150}>
                     <div className="h-full flex flex-col">
                         <SidebarPanelHeading className="shrink-0">
                             <div className="i-mynaui:layers-three size-4.5" />
@@ -79,20 +87,43 @@ export function NodePropertiesPanel() {
                     </div>
                 </Pane>
 
-                <Pane minSize={300}>
-                    <div className="h-full flex flex-col">
-                        <SidebarPanelHeading className="shrink-0">
-                            <div className="i-mynaui:cog size-4.5" />
-                            Properties
-                        </SidebarPanelHeading>
+                {/* Main content panes - Properties and Execution Details */}
+                <SplitPane
+                    split="horizontal"
+                    defaultSizes={hasExecutionData ? [60, 40] : [100, 0]}
+                >
+                    {/* Properties Panel */}
+                    <Pane minSize={200}>
+                        <div className="h-full flex flex-col">
+                            <SidebarPanelHeading className="shrink-0">
+                                <div className="i-mynaui:cog size-4.5" />
+                                Properties
+                            </SidebarPanelHeading>
 
-                        <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
-                            {selectedNode
-                                ? <NodePropertyPanel id={selectedNode.id} type={selectedNode.type} data={selectedNodeData} />
-                                : <IntroductionPropertyPanel />}
-                        </OverlayScrollbarsComponent>
-                    </div>
-                </Pane>
+                            <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
+                                {selectedNode
+                                    ? <NodePropertyPanel id={selectedNode.id} type={selectedNode.type} data={selectedNodeData} />
+                                    : <IntroductionPropertyPanel />}
+                            </OverlayScrollbarsComponent>
+                        </div>
+                    </Pane>
+
+                    {/* Execution Details Panel */}
+                    {hasExecutionData && (
+                        <Pane minSize={100}>
+                            <div className="h-full flex flex-col">
+                                <SidebarPanelHeading className="shrink-0">
+                                    <div className="i-mdi:chart-timeline size-4.5" />
+                                    Execution Details
+                                </SidebarPanelHeading>
+
+                                <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
+                                    <ExecutionExplorerPanel />
+                                </OverlayScrollbarsComponent>
+                            </div>
+                        </Pane>
+                    )}
+                </SplitPane>
             </SplitPane>
         </SidebarPanelWrapper>
     );
