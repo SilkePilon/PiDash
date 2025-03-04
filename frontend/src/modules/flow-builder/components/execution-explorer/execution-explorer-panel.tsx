@@ -1,5 +1,7 @@
 import { useReactFlow } from "@xyflow/react";
+import type { Node } from "@xyflow/react";
 import { memo, useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { useApplicationState } from "~/stores/application-state";
 import { cn } from "~@/utils/cn";
 import { ExecutionStatus } from "~/modules/nodes/types";
@@ -8,16 +10,35 @@ export interface ExecutionExplorerPanelProps {
   className?: string;
 }
 
-export const ExecutionExplorerPanel = memo(({ className }: ExecutionExplorerPanelProps) => {
+interface ExecutionResult {
+  message?: string;
+  stdout?: string;
+  stderr?: string;
+  error?: string;
+  command?: string;
+  pin?: number;
+  state?: boolean | string;
+  executionTime?: number;
+}
+
+interface NodeData extends Record<string, unknown> {
+  executing?: boolean;
+  executionStatus?: ExecutionStatus;
+  executionResult?: ExecutionResult;
+}
+
+type ExecutionNode = Node<NodeData>;
+
+export const ExecutionExplorerPanel = memo(({ className }: ExecutionExplorerPanelProps): ReactNode => {
   const [selectedNode] = useApplicationState(s => [s.sidebar.panels.nodeProperties.selectedNode]);
   const { getNode } = useReactFlow();
-  const [node, setNode] = useState<any>(null);
+  const [node, setNode] = useState<ExecutionNode | null>(null);
   
   // Update node data when selected node changes
   useEffect(() => {
     if (selectedNode) {
       const currentNode = getNode(selectedNode.id);
-      setNode(currentNode);
+      setNode(currentNode as ExecutionNode | null);
     } else {
       setNode(null);
     }
@@ -33,7 +54,7 @@ export const ExecutionExplorerPanel = memo(({ className }: ExecutionExplorerPane
   const hasResult = !!executionResult;
   
   // Status colors
-  const statusColors = {
+  const statusColors: Record<ExecutionStatus, string> = {
     [ExecutionStatus.RUNNING]: "text-yellow-400",
     [ExecutionStatus.SUCCESS]: "text-green-400",
     [ExecutionStatus.ERROR]: "text-red-400",
@@ -41,6 +62,8 @@ export const ExecutionExplorerPanel = memo(({ className }: ExecutionExplorerPane
     [ExecutionStatus.SKIPPED]: "text-gray-400",
     [ExecutionStatus.NONE]: "text-light-900/50"
   };
+  
+  const currentStatusColor = statusColors[executionStatus as ExecutionStatus] || statusColors[ExecutionStatus.NONE];
   
   return (
     <div className={cn("px-4 py-3", className)}>
@@ -54,7 +77,7 @@ export const ExecutionExplorerPanel = memo(({ className }: ExecutionExplorerPane
           <span className={cn(
             "text-xs px-2 py-1 rounded-full",
             executing ? "bg-yellow-500/10 text-yellow-400" : 
-            statusColors[executionStatus || ExecutionStatus.NONE],
+            currentStatusColor,
             executing ? "bg-yellow-500/10" :
             executionStatus === ExecutionStatus.SUCCESS ? "bg-green-500/10" :
             executionStatus === ExecutionStatus.ERROR ? "bg-red-500/10" :

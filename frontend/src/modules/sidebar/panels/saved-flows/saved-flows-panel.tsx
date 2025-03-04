@@ -26,7 +26,13 @@ export const SavedFlowsModal = memo(({ isOpen, onClose }: SavedFlowsModalProps) 
       setLoading(true);
       setError(null);
       const savedFlows = await flowExecutionService.getSavedFlows();
-      setFlows(savedFlows);
+      // Filter out any flows that don't have required properties
+      const validFlows = savedFlows.filter((flow): flow is SavedFlow => 
+        typeof flow.id === 'string' && 
+        typeof flow.createdAt === 'string' && 
+        typeof flow.updatedAt === 'string'
+      );
+      setFlows(validFlows);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load saved flows');
     } finally {

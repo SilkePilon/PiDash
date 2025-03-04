@@ -44,14 +44,14 @@ export function ExecutionControls() {
       setShowResults(true);
       
       // Update node states based on execution results
-      if (result.nodeResults) {
+      if (result && result.nodeResults) {
         setNodes(nodes.map(node => ({
           ...node,
           data: { 
             ...node.data, 
             executing: false,
-            executionStatus: result.nodeResults[node.id]?.status || 'none',
-            executionResult: result.nodeResults[node.id]
+            executionStatus: result.nodeResults && result.nodeResults[node.id]?.status || 'none',
+            executionResult: result.nodeResults && result.nodeResults[node.id]
           }
         })));
       } else {
