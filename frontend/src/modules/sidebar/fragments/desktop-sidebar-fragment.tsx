@@ -19,7 +19,7 @@ export function DesktopSidebarFragment({ isMobileView, activePanel, setActivePan
     }, [activePanel, setActivePanel, isMobileView]);
 
     return (
-        <div className="relative max-w-sm w-fit flex shrink-0 divide-x divide-dark-300">
+        <div style={{zIndex: "1"}} className="relative max-w-sm w-fit flex shrink-0 divide-x divide-dark-300">
             {activePanel !== "none" && (
                 <div className="min-w-xs grow bg-dark-500">
                     <SwitchSidebarPanel active={activePanel} />

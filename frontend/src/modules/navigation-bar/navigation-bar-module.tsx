@@ -4,18 +4,25 @@ import { useFlowValidator } from "~/modules/flow-builder/hooks/use-flow-validato
 import { SocialButtonLink } from "~/modules/navigation-bar/components/social-button-link";
 import { useApplicationState } from "~/stores/application-state";
 import { trackSocialLinkClick } from "~/utils/ga4";
+import { signOut, useUser } from "~/modules/auth/auth-module";
 
 import { Switch } from "~@/components/generics/switch-case";
 import { Whenever } from "~@/components/generics/whenever";
 import { cn } from "~@/utils/cn";
 
 export function NavigationBarModule() {
+    const { user, isAuthenticated } = useUser();
     const [isMobileView] = useApplicationState((s) => [s.view.mobile]);
 
     const [isValidating, validateFlow] = useFlowValidator((isValid) => {
         if (isValid) toast.success("Flow is valid", { description: "You can now proceed to the next step", dismissible: true });
         else toast.error("Flow is invalid", { description: "Please check if the flow is complete and has no lone nodes" });
     });
+
+    const handleSignOut = () => {
+        toast.success("Signed out successfully", { dismissible: true });
+        signOut();
+    };
 
     return (
         <div className="relative shrink-0 bg-dark-700 px-1.5 py-2">
@@ -68,6 +75,26 @@ export function NavigationBarModule() {
                                 <div className="i-mynaui:brand-github size-4.5" />
                             </SocialButtonLink>
                         </div>
+
+                        {isAuthenticated && (
+                            <>
+                                <div className="h-4 w-px bg-dark-300" />
+                                
+                                <div className="flex items-stretch gap-x-0.5">
+                                    <div className="px-2 flex items-center">
+                                        <span className="text-sm text-light-900/70">{user?.name}</span>
+                                    </div>
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={handleSignOut}
+                                        className="h-8 w-8 flex items-center justify-center outline-none border border-dark-300 rounded-lg bg-dark-500 transition active:(bg-dark-600) hover:(bg-dark-400)"
+                                    >
+                                        <div className="i-mynaui:logout size-4" />
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </Whenever>
             </div>
