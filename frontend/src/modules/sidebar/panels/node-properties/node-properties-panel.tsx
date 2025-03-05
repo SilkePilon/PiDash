@@ -1,7 +1,8 @@
 import { useNodes, useReactFlow } from "@xyflow/react";
 import { produce } from "immer";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import type { ReactElement } from "react";
 import SplitPane, { Pane } from "split-pane-react";
 
 import { ExecutionExplorerPanel } from "~/modules/flow-builder/components/execution-explorer/execution-explorer-panel";
@@ -24,6 +25,8 @@ export function NodePropertiesPanel() {
         setSelectedNode: s.actions.sidebar.panels.nodeProperties.setSelectedNode,
     }));
 
+    const [detailsPaneSizes, setDetailsPaneSizes] = useState<number[]>([100, 0]);
+    
     const nodes = useNodes();
 
     const nodeList = useNodeList(nodes);
@@ -51,11 +54,30 @@ export function NodePropertiesPanel() {
         return node && (node.data.executing || node.data.executionStatus || node.data.executionResult);
     }, [nodes, selectedNode]);
 
+    // Update detail pane sizes based on execution data
+    useMemo(() => {
+        setDetailsPaneSizes(hasExecutionData ? [60, 40] : [100, 0]);
+    }, [hasExecutionData]);
+
+    // Render execution details or empty div
+    const executionDetailsContent = hasExecutionData ? (
+        <div className="h-full flex flex-col">
+            <SidebarPanelHeading className="shrink-0">
+                <div className="i-mdi:chart-timeline size-4.5" />
+                Execution Details
+            </SidebarPanelHeading>
+
+            <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
+                <ExecutionExplorerPanel />
+            </OverlayScrollbarsComponent>
+        </div>
+    ) : <div className="empty-placeholder"></div>;
+
     return (
         <SidebarPanelWrapper>
             <SplitPane
                 sizes={paneSizes}
-                sashRender={() => <div className="bg-dark-300) <md:hover(scale-y-100 h-0.5 bg-dark-300 transition hover:(scale-y-200 bg-teal-800/50)" />}
+                sashRender={(): ReactElement => <div className="bg-dark-300) <md:hover(scale-y-100 h-0.5 bg-dark-300 transition hover:(scale-y-200 bg-teal-800/50)" />}
                 onChange={setPaneSizes}
                 split="horizontal"
             >
@@ -87,43 +109,35 @@ export function NodePropertiesPanel() {
                     </div>
                 </Pane>
 
-                {/* Main content panes - Properties and Execution Details */}
-                <SplitPane
-                    split="horizontal"
-                    defaultSizes={hasExecutionData ? [60, 40] : [100, 0]}
-                >
-                    {/* Properties Panel */}
-                    <Pane minSize={200}>
-                        <div className="h-full flex flex-col">
-                            <SidebarPanelHeading className="shrink-0">
-                                <div className="i-mynaui:cog size-4.5" />
-                                Properties
-                            </SidebarPanelHeading>
+                <Pane>
+                    <div className="h-full">
+                        <SplitPane 
+                            split="horizontal" 
+                            sizes={detailsPaneSizes}
+                            onChange={setDetailsPaneSizes}
+                            sashRender={(): ReactElement => <div className="bg-dark-300) <md:hover(scale-y-100 h-0.5 bg-dark-300 transition hover:(scale-y-200 bg-teal-800/50)" />}
+                        >
+                            <Pane minSize={200}>
+                                <div className="h-full flex flex-col">
+                                    <SidebarPanelHeading className="shrink-0">
+                                        <div className="i-mynaui:cog size-4.5" />
+                                        Properties
+                                    </SidebarPanelHeading>
 
-                            <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
-                                {selectedNode
-                                    ? <NodePropertyPanel id={selectedNode.id} type={selectedNode.type} data={selectedNodeData} />
-                                    : <IntroductionPropertyPanel />}
-                            </OverlayScrollbarsComponent>
-                        </div>
-                    </Pane>
+                                    <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
+                                        {selectedNode 
+                                            ? <NodePropertyPanel id={selectedNode.id} type={selectedNode.type} data={selectedNodeData} />
+                                            : <IntroductionPropertyPanel />}
+                                    </OverlayScrollbarsComponent>
+                                </div>
+                            </Pane>
 
-                    {/* Execution Details Panel */}
-                    {hasExecutionData && (
-                        <Pane minSize={100}>
-                            <div className="h-full flex flex-col">
-                                <SidebarPanelHeading className="shrink-0">
-                                    <div className="i-mdi:chart-timeline size-4.5" />
-                                    Execution Details
-                                </SidebarPanelHeading>
-
-                                <OverlayScrollbarsComponent className="grow" defer options={defaultOverlayScrollbarsOptions}>
-                                    <ExecutionExplorerPanel />
-                                </OverlayScrollbarsComponent>
-                            </div>
-                        </Pane>
-                    )}
-                </SplitPane>
+                            <Pane minSize={hasExecutionData ? 100 : 0}>
+                                {executionDetailsContent}
+                            </Pane>
+                        </SplitPane>
+                    </div>
+                </Pane>
             </SplitPane>
         </SidebarPanelWrapper>
     );
